@@ -84,7 +84,7 @@ void displayReadings()
   LoRa.print(":");
   LoRa.print(Altitude);
   LoRa.print("m");
-  Serial.print("Sending packet: ");
+  Serial.println("Sending packet: ");
 }
 
 void sendReadings() {
@@ -97,7 +97,7 @@ void sendReadings() {
   Serial.println("Packet Sent!");
   displayReadings();
 
-  delay(500);
+  delay(1000);
 }
 
 void loop() {

@@ -25,13 +25,12 @@ void loop() {
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
     // received a packet
-    Serial.println("Received packet '");
+    //Serial.println("Received packet '");
 
     // read packet
     while (LoRa.available()) {
       String LoRaData = LoRa.readString();
-      //Serial.println(LoRaData); 
-      
+            
       // Get readingID, temperature and soil moisture
       int pos1 = LoRaData.indexOf('&');
       int pos2 = LoRaData.indexOf('#');
@@ -39,19 +38,12 @@ void loop() {
       Pressure = LoRaData.substring(pos1+1, pos2);
       Altitude = LoRaData.substring(pos2+1, LoRaData.length());  
 
-      Serial.print("TEMPERATURE");
-      Serial.print(":");
       Serial.print(Temperature);
-      Serial.println("*C");
-      Serial.print("PRESSURE");
-      Serial.print(":");
+      Serial.print(" ");
       Serial.print(Pressure);
-      Serial.println("Pa");
-      Serial.print("ALTITUBE");
-      Serial.print(":");
+      Serial.print(" ");
       Serial.print(Altitude);
-      Serial.println("m"); 
-      Serial.println();   
+      Serial.println(); 
     }
   }
 }
