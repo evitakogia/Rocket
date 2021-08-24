@@ -4,7 +4,7 @@ import requests
 
 SERIAL = 'COM7'
 RATE = 9600
-SERVER = "127.0.0.1:8000"
+SERVER = "http://127.0.0.1:8000/data/"
 
 
 def create_json_body(data):

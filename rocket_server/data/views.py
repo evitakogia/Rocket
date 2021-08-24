@@ -1,5 +1,6 @@
-from django.http import JsonResponse, HttpResponseNotAllowed
+from django.http import JsonResponse, HttpResponseNotAllowed, HttpResponse
 import random
+import json
 
 def index(request):
     if request.method == "GET":
@@ -10,7 +11,7 @@ def index(request):
                  "alt": 10*random.random()} for i in range(20)]
         return JsonResponse(points, safe=False)
     elif request.method == "POST":
-        pass
+        data = json.loads(request.body)
+        return HttpResponse("OK")
     else:
         return HttpResponseNotAllowed(["GET", "POST"])
-
