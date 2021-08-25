@@ -7,14 +7,14 @@ RATE = 9600
 SERVER = "http://127.0.0.1:8000/data/"
 
 
-def create_json_body(data):
+def create_dict_body(data):
     list_data = list(data)
     body = {
-        "Temperature": list_data[0],
-        "Pressure": list_data[1],
-        "Altitude": list_data[2]
+        "temperature": list_data[0],
+        "pressure": list_data[1],
+        "altitude": list_data[2]
     }
-    return json.dumps(body)
+    return body
 
 
 def read_from_port(ser):
@@ -34,7 +34,7 @@ def main():
     # Read data from serial and send them in JSON to server
     while True:
         data = read_from_port(serial_port)
-        body = create_json_body(data)
+        body = create_dict_body(data)
         requests.post(SERVER, json=body)
 
 
