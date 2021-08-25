@@ -63,213 +63,84 @@
         var yAxis = d3.svg.axis().scale(y)
             .orient("left").ticks(10);
 
-        // Define the line - temperature
-        var valueline_temp = d3.svg.line()
-            .x(function (d) { return x(d.time); })
-            .y(function (d) { return y(d.temp); });
+        setInterval(read_data, 3000);
 
-        // Define the line - pressure
-        var valueline_press = d3.svg.line()
-            .x(function (d) { return x(d.time); })
-            .y(function (d) { return y(d.press); });
+        var temp = d3.select("body")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // Define the line - altitube
-        var valueline_alt = d3.svg.line()
-            .x(function (d) { return x(d.time); })
-            .y(function (d) { return y(d.alt); });
+        var press = d3.select("body")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        setInterval(read_temp, 3000);
-        setInterval(read_press, 3000);
-        setInterval(read_alt, 3000);
+        var alt = d3.select("body")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // append the svg object to the body of the page - temperature
-        var temperature = d3.select("body")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        function process_data(data, name, element, fn, fn2) {
+            var valueline = d3.svg.line()
+                .x(function (d) { return x(d.time); })
+                .y(fn2);
 
+
+            x.domain(d3.extent(data, function (d) { return d.time; }));
+            y.domain([d3.min(data, fn) - 1, d3.max(data, fn) + 1]);
+
+            // Add white background
+            element.append("rect")
+                .attr("width", width + 70)
+                .attr("height", height + 70)
+                .attr("x", 0 - margin.left)
+                .attr("y", 0 - margin.top)
+                .attr("fill", "white");
+
+            // Add the valueline path.
+            element.append("path")
+                .attr("class", "line")
+                .attr("d", valueline(data));
+
+            // Add the X Axis
+            element.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+
+            // text label for the x axis
+            element.append("text")
+                .attr("transform",
+                    "translate(" + (width / 2) + " ," + (height + margin.top + 20) + ")")
+                .style("text-anchor", "middle")
+                .text("Time");
+
+            // Add the Y Axis
+            element.append("g")
+                .attr("class", "y axis")
+                .call(yAxis);
+
+            // text label for the y axis
+            element.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0 - margin.left)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .text(name);
+        }
         //Read the data
-        function read_temp() {
+        function read_data() {
             d3.json("http://127.0.0.1:8000/data/", function (data) {
-                //    console.log(data);
-                data.forEach(function (d) {
-                    d.time = d.time;
-                    d.temp = +d.temp;
-                });
-
-                // Scale the range of the data
-                x.domain(d3.extent(data, function (d) { return d.time; }));
-                y.domain([d3.min(data, function (d) { return d.temp; })-1, d3.max(data, function (d) { return d.temp; })+1]);
-
-                // Add white background
-                temperature.append("rect")
-                    .attr("width", width + 70)
-                    .attr("height", height + 70)
-                    .attr("x", 0 - margin.left)
-                    .attr("y", 0 - margin.top)
-                    .attr("fill", "white");
-
-                // Add the valueline path.
-                temperature.append("path")
-                    .attr("class", "line")
-                    .attr("d", valueline_temp(data));
-
-                // Add the X Axis
-                temperature.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis);
-
-                // text label for the x axis
-                temperature.append("text")
-                    .attr("transform",
-                        "translate(" + (width / 2) + " ," + (height + margin.top + 20) + ")")
-                    .style("text-anchor", "middle")
-                    .text("Time");
-
-                // Add the Y Axis
-                temperature.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis);
-
-                // text label for the y axis
-                temperature.append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 0 - margin.left)
-                    .attr("x", 0 - (height / 2))
-                    .attr("dy", "1em")
-                    .style("text-anchor", "middle")
-                    .text("Temperature");
-            });
-        }
-
-        // append the svg object to the body of the page - pressure
-        var pressure = d3.select("body")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        function read_press() {
-            //Read the data
-            d3.json("http://127.0.0.1:8000/data/", function (data) {
-                //    console.log(data);
-                data.forEach(function (d) {
-                    d.time = d.time;
-                    d.press = +d.press;
-                });
-
-                // Scale the range of the data
-                x.domain(d3.extent(data, function (d) { return d.time; }));
-                y.domain([0, d3.max(data, function (d) { return d.press; })]);
-
-                // Add white background
-                pressure.append("rect")
-                    .attr("width", width + 70)
-                    .attr("height", height + 70)
-                    .attr("x", 0 - margin.left)
-                    .attr("y", 0 - margin.top)
-                    .attr("fill", "white");
-
-                // Add the valueline path.
-                pressure.append("path")
-                    .attr("class", "line")
-                    .attr("d", valueline_press(data));
-
-                // Add the X Axis
-                pressure.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis);
-
-                // text label for the x axis
-                pressure.append("text")
-                    .attr("transform",
-                        "translate(" + (width / 2) + " ," + (height + margin.top + 20) + ")")
-                    .style("text-anchor", "middle")
-                    .text("Time");
-
-                // Add the Y Axis
-                pressure.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis);
-
-                // text label for the y axis
-                pressure.append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 0 - margin.left)
-                    .attr("x", 0 - (height / 2))
-                    .attr("dy", "1em")
-                    .style("text-anchor", "middle")
-                    .text("Pressure");
-
-            });
-        }
-
-        // append the svg object to the body of the page - altitube
-        var altitube = d3.select("body")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        function read_alt() {
-            //Read the data
-            d3.json("http://127.0.0.1:8000/data/", function (data) {
-                //    console.log(data);
-                data.forEach(function (d) {
-                    d.time = d.time;
-                    d.alt = +d.alt;
-                });
-
-                // Scale the range of the data
-                x.domain(d3.extent(data, function (d) { return d.time; }));
-                y.domain([0, d3.max(data, function (d) { return d.alt; })]);
-
-                // Add white background
-                altitube.append("rect")
-                    .attr("width", width + 70)
-                    .attr("height", height + 70)
-                    .attr("x", 0 - margin.left)
-                    .attr("y", 0 - margin.top)
-                    .attr("fill", "white");
-
-                // Add the valueline path.
-                altitube.append("path")
-                    .attr("class", "line")
-                    .attr("d", valueline_alt(data));
-
-                // Add the X Axis
-                altitube.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis);
-
-                // text label for the x axis
-                altitube.append("text")
-                    .attr("transform",
-                        "translate(" + (width / 2) + " ," + (height + margin.top + 20) + ")")
-                    .style("text-anchor", "middle")
-                    .text("Time");
-
-                // Add the Y Axis
-                altitube.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis);
-
-                // text label for the y axis
-                altitube.append("text")
-                    .attr("transform", "rotate(-90)")
-                    .attr("y", 0 - margin.left)
-                    .attr("x", 0 - (height / 2))
-                    .attr("dy", "1em")
-                    .style("text-anchor", "middle")
-                    .text("Altitube");
-
+                process_data(data, "Temperature", temp, function (d) { return d.temp; }, function (d) { return y(d.temp); });
+                process_data(data, "Pressure", press,  function (d) { return d.press; }, function (d) { return y(d.press); });
+                process_data(data, "Altitude", alt, function (d) { return d.alt; }, function (d) { return y(d.alt); });
             });
         }
     </script>
