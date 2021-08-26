@@ -22,9 +22,10 @@ def read_from_port(ser):
     while True:
         reading += ser.readline().decode()
         if reading != "":
-            data = reading.split(" ")
+            data = list(filter(None, reading.split(" ")))
             if len(data) == 3:
                 return map(float, data)
+                
 
 
 def main():
